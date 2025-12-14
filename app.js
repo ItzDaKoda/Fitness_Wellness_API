@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 });
 
 // Resource routes
-app.use("/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/goals", goalRoutes);
