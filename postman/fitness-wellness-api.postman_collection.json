@@ -1,8 +1,8 @@
 {
   "info": {
     "_postman_id": "4f0b5e5b-0000-0000-0000-fitness-wellness-api",
-    "name": "Fitness & Wellness Tracker API (MVP)",
-    "description": "Postman collection for testing the Fitness & Wellness Tracker REST API MVP.",
+    "name": "Fitness & Wellness Tracker API (AUTH + RBAC)",
+    "description": "Postman collection for testing the Fitness & Wellness Tracker REST API with JWT auth + role-based access.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -14,478 +14,279 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                ""
-              ]
-            }
+            "url": { "raw": "{{baseUrl}}/", "host": ["{{baseUrl}}"], "path": [""] }
           },
           "response": []
         }
       ]
     },
     {
-      "name": "Users",
+      "name": "Auth",
       "item": [
         {
-          "name": "GET /api/users - Get All Users",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/users",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "users"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "GET /api/users/:id - Get User by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/users/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "POST /api/users - Create User",
+          "name": "POST /api/auth/register - Register User",
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Sam Tester\",\n  \"email\": \"sam@example.com\",\n  \"passwordHash\": \"test123\",\n  \"role\": \"user\",\n  \"age\": 29,\n  \"height\": 175,\n  \"weight\": 150\n}"
+              "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"user1@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"user\"\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/users",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "users"
-              ]
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
             }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) pm.collectionVariables.set('tokenUser', json.token);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/register - Register Coach",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Coach Account\",\n  \"email\": \"coach1@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"coach\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) pm.collectionVariables.set('tokenCoach', json.token);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/login - Login User",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user1@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) pm.collectionVariables.set('tokenUser', json.token);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/login - Login Coach",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"coach1@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/api/auth/login", "host": ["{{baseUrl}}"], "path": ["api", "auth", "login"] }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const json = pm.response.json();",
+                  "  if (json.token) pm.collectionVariables.set('tokenCoach', json.token);",
+                  "} catch (e) {}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "GET /api/auth/me - Me (User Token)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/me", "host": ["{{baseUrl}}"], "path": ["api", "auth", "me"] }
           },
           "response": []
         },
         {
-          "name": "PUT /api/users/:id - Update User",
+          "name": "POST /api/auth/logout - Logout (User Token)",
           "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Updated Name\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/users/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "DELETE /api/users/:id - Delete User",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/users/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "users",
-                "1"
-              ]
-            }
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{baseUrl}}/api/auth/logout", "host": ["{{baseUrl}}"], "path": ["api", "auth", "logout"] }
           },
           "response": []
         }
       ]
     },
+
+    {
+      "name": "Users (Coach Only)",
+      "item": [
+        {
+          "name": "GET /api/users/me - My Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/me", "host": ["{{baseUrl}}"], "path": ["api", "users", "me"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/users - Get All Users (Coach)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenCoach}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users", "host": ["{{baseUrl}}"], "path": ["api", "users"] }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/users/:id - Get User by ID (Coach)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenCoach}}" }],
+            "url": { "raw": "{{baseUrl}}/api/users/1", "host": ["{{baseUrl}}"], "path": ["api", "users", "1"] }
+          },
+          "response": []
+        }
+      ]
+    },
+
     {
       "name": "Workouts",
       "item": [
         {
-          "name": "GET /api/workouts - Get All Workouts",
+          "name": "GET /api/workouts - Get Workouts (User sees own, Coach sees all)",
           "request": {
             "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/workouts",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "workouts"
-              ]
-            }
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{baseUrl}}/api/workouts", "host": ["{{baseUrl}}"], "path": ["api", "workouts"] }
           },
           "response": []
         },
         {
-          "name": "GET /api/workouts/:id - Get Workout by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/workouts/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "workouts",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "POST /api/workouts - Create Workout",
+          "name": "POST /api/workouts - Create Workout (User)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 1,\n  \"exerciseName\": \"Cycling\",\n  \"duration\": 45,\n  \"intensity\": \"medium\",\n  \"caloriesBurned\": 300,\n  \"date\": \"2025-01-15\",\n  \"notes\": \"Felt good today\"\n}"
+              "raw": "{\n  \"exerciseName\": \"Cycling\",\n  \"duration\": 45,\n  \"intensity\": \"medium\",\n  \"caloriesBurned\": 300,\n  \"date\": \"2025-01-15\",\n  \"notes\": \"Felt good today\"\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/api/workouts",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "workouts"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "PUT /api/workouts/:id - Update Workout",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"notes\": \"Updated workout notes\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/workouts/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "workouts",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "DELETE /api/workouts/:id - Delete Workout",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/workouts/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "workouts",
-                "1"
-              ]
-            }
+            "url": { "raw": "{{baseUrl}}/api/workouts", "host": ["{{baseUrl}}"], "path": ["api", "workouts"] }
           },
           "response": []
         }
       ]
     },
+
     {
       "name": "Goals",
       "item": [
         {
-          "name": "GET /api/goals - Get All Goals",
+          "name": "GET /api/goals - Get Goals (User sees own, Coach sees all)",
           "request": {
             "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/goals",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "goals"
-              ]
-            }
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
+            "url": { "raw": "{{baseUrl}}/api/goals", "host": ["{{baseUrl}}"], "path": ["api", "goals"] }
           },
           "response": []
         },
         {
-          "name": "GET /api/goals/:id - Get Goal by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/goals/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "goals",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "POST /api/goals - Create Goal",
+          "name": "POST /api/goals - Create Goal (User)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 1,\n  \"goalType\": \"strength training\",\n  \"targetValue\": 200,\n  \"currentValue\": 150,\n  \"deadline\": \"2025-02-01\",\n  \"isCompleted\": false\n}"
+              "raw": "{\n  \"goalType\": \"strength training\",\n  \"targetValue\": 200,\n  \"currentValue\": 150,\n  \"deadline\": \"2025-02-01\",\n  \"isCompleted\": false\n}"
             },
-            "url": {
-              "raw": "{{baseUrl}}/api/goals",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "goals"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "PUT /api/goals/:id - Update Goal",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"currentValue\": 160\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/goals/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "goals",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "DELETE /api/goals/:id - Delete Goal",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/goals/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "goals",
-                "1"
-              ]
-            }
+            "url": { "raw": "{{baseUrl}}/api/goals", "host": ["{{baseUrl}}"], "path": ["api", "goals"] }
           },
           "response": []
         }
       ]
     },
+
     {
       "name": "Wellness Logs",
       "item": [
         {
-          "name": "GET /api/wellness-logs - Get All Wellness Logs",
+          "name": "GET /api/wellness-logs - Get Logs (User sees own, Coach sees all)",
           "request": {
             "method": "GET",
-            "header": [],
+            "header": [{ "key": "Authorization", "value": "Bearer {{tokenUser}}" }],
             "url": {
               "raw": "{{baseUrl}}/api/wellness-logs",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "wellness-logs"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "wellness-logs"]
             }
           },
           "response": []
         },
         {
-          "name": "GET /api/wellness-logs/:id - Get Wellness Log by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/wellness-logs/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "wellness-logs",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "POST /api/wellness-logs - Create Wellness Log",
+          "name": "POST /api/wellness-logs - Create Log (User)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{tokenUser}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"userId\": 1,\n  \"sleepHours\": 8,\n  \"waterIntake\": 70,\n  \"mood\": \"relaxed\",\n  \"habitsCompleted\": true,\n  \"date\": \"2025-01-15\"\n}"
+              "raw": "{\n  \"sleepHours\": 8,\n  \"waterIntake\": 70,\n  \"mood\": \"relaxed\",\n  \"habitsCompleted\": true,\n  \"date\": \"2025-01-15\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/wellness-logs",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "wellness-logs"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "PUT /api/wellness-logs/:id - Update Wellness Log",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"mood\": \"energized\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/wellness-logs/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "wellness-logs",
-                "1"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "DELETE /api/wellness-logs/:id - Delete Wellness Log",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/wellness-logs/1",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "wellness-logs",
-                "1"
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "wellness-logs"]
             }
           },
           "response": []
@@ -494,9 +295,8 @@
     }
   ],
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:3000"
-    }
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "tokenUser", "value": "" },
+    { "key": "tokenCoach", "value": "" }
   ]
 }

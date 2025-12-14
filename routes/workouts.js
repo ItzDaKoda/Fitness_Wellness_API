@@ -2,49 +2,49 @@ const express = require("express");
 const router = express.Router();
 const { Workout } = require("../database/models/associations");
 
-// GET /api/workouts
-router.get("/", async (req, res, next) => {
+const { authenticate, requireRole, requireOwnerOrRole } = require("../middleware/auth");
+
+// All workout routes require login
+router.use(authenticate);
+
+// GET all (user = only theirs, coach = all)
+router.get("/", authenticate, async (req, res, next) => {
   try {
-    const workouts = await Workout.findAll();
+    const where = req.user.role === "coach" ? {} : { userId: req.user.id };
+    const workouts = await Workout.findAll({ where });
     res.json(workouts);
   } catch (err) {
     next(err);
   }
 });
 
-// GET /api/workouts/:id
-router.get("/:id", async (req, res, next) => {
+// GET by id (user = only theirs, coach = any)
+router.get("/:id", authenticate, async (req, res, next) => {
   try {
     const workout = await Workout.findByPk(req.params.id);
-    if (!workout)
-      return res.status(404).json({ error: "Workout not found" });
+    if (!workout) return res.status(404).json({ error: "Workout not found" });
+
+    if (req.user.role !== "coach" && workout.userId !== req.user.id) {
+      return res.status(403).json({ error: "Forbidden: not your workout" });
+    }
+
     res.json(workout);
   } catch (err) {
     next(err);
   }
 });
 
-// POST /api/workouts
-router.post("/", async (req, res, next) => {
+// POST (users only; userId forced to token user)
+router.post("/", authenticate, requireRole("user"), async (req, res, next) => {
   try {
-    const {
-      userId,
-      exerciseName,
-      duration,
-      intensity,
-      caloriesBurned,
-      date,
-      notes,
-    } = req.body;
+    const { exerciseName, duration, intensity, caloriesBurned, date, notes } = req.body;
 
-    if (!userId || !exerciseName || !duration || !date) {
-      return res.status(400).json({
-        error: "userId, exerciseName, duration, and date are required",
-      });
+    if (!exerciseName || !duration || !date) {
+      return res.status(400).json({ error: "exerciseName, duration, and date are required" });
     }
 
     const workout = await Workout.create({
-      userId,
+      userId: req.user.id,
       exerciseName,
       duration,
       intensity,
@@ -59,12 +59,15 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// PUT /api/workouts/:id
-router.put("/:id", async (req, res, next) => {
+// PUT (users only; only own)
+router.put("/:id", authenticate, requireRole("user"), async (req, res, next) => {
   try {
     const workout = await Workout.findByPk(req.params.id);
-    if (!workout)
-      return res.status(404).json({ error: "Workout not found" });
+    if (!workout) return res.status(404).json({ error: "Workout not found" });
+
+    if (workout.userId !== req.user.id) {
+      return res.status(403).json({ error: "Forbidden: not your workout" });
+    }
 
     await workout.update(req.body);
     res.json(workout);
@@ -73,12 +76,15 @@ router.put("/:id", async (req, res, next) => {
   }
 });
 
-// DELETE /api/workouts/:id
-router.delete("/:id", async (req, res, next) => {
+// DELETE (users only; only own)
+router.delete("/:id", authenticate, requireRole("user"), async (req, res, next) => {
   try {
     const workout = await Workout.findByPk(req.params.id);
-    if (!workout)
-      return res.status(404).json({ error: "Workout not found" });
+    if (!workout) return res.status(404).json({ error: "Workout not found" });
+
+    if (workout.userId !== req.user.id) {
+      return res.status(403).json({ error: "Forbidden: not your workout" });
+    }
 
     await workout.destroy();
     res.status(204).send();

@@ -6,6 +6,7 @@ const userRoutes = require("./routes/users");
 const workoutRoutes = require("./routes/workouts");
 const goalRoutes = require("./routes/goals");
 const wellnessRoutes = require("./routes/wellnessLogs");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 
@@ -19,10 +20,13 @@ app.get("/", (req, res) => {
 });
 
 // Resource routes
+app.use("/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/goals", goalRoutes);
 app.use("/api/wellness-logs", wellnessRoutes);
+
+
 
 // 404 handler
 app.use((req, res, next) => {
